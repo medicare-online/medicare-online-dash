@@ -9,4 +9,3 @@ gspread
 oauth2client
 requests
 gunicorn
-wsgi
