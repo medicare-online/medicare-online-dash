@@ -23,17 +23,19 @@ scope = ['https://spreadsheets.google.com/feeds',
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
 
-gc = gspread.authorize(credentials)
+#gc = gspread.authorize(credentials)
 
-workbook = gc.open_by_key("1yO7zmBlwV3CAnojepXIi7eJymDjW8CGaFZKUPzA2HZ4")
-sheet = workbook.worksheet("Sheet1")
+#workbook = gc.open_by_key("1yO7zmBlwV3CAnojepXIi7eJymDjW8CGaFZKUPzA2HZ4")
+#sheet = workbook.worksheet("Sheet1")
 
-data = sheet.get_all_values()
-headers = data.pop(0)
+#data = sheet.get_all_values()
+#headers = data.pop(0)
 
-df_info = pd.DataFrame(data, columns=headers)
+#df_info = pd.DataFrame(data, columns=headers)
+df_info = pd.read_excel('Diabetes.xlsx',sheet_name='Sheet1')
 
 accounts = df_info[df_info.account != ''][['account', 'שם']].rename(columns={'שם': 'name'})
+#accounts = ['medicarens']
 
 df_info = df_info.rename(columns={'שם': 'Name', 'account': 'Account','סוכר בצום': 'Fasting Sugar', 'A1c': 'A1C',
 'תרופת סוכרת 1': 'Sugar Med 1','תרופת סוכרת 2': 'Sugar Med 2','תרופת סוכרת 3': 'Sugar Med 3','תרופת סוכרת 4': 'Sugar Med 4'})
@@ -150,7 +152,7 @@ def clean_data(n):
     columns = ["_id", "date", "dateString", "rssi", "device", "direction", "rawbg", "sgv", "type", "utcOffset",
                "sysTime", "User_Site", "Date_Time", "Hour", "Date"]
     sugar_data = pd.DataFrame(columns=columns)
-    for account in accounts.account:
+    for account in accounts[accounts.account == 'medicarens'].account:
         get_string = "https://{}.herokuapp.com/api/v1/entries/sgv.json?find[dateString][$gte]>{}&count=300".format(
             account, start_date)
         data = requests.get(get_string)
@@ -294,4 +296,4 @@ def update_info_table(selector):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
